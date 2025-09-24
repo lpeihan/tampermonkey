@@ -30,14 +30,20 @@
     let currentElement = element;
     while (currentElement) {
       const instance = currentElement.__vueParentComponent;
+      let currentInstance = instance;
 
-      if (instance && instance.type && instance.type.__file) {
-        return {
-          fileName: window.env.__dirname + "/" + instance.type.__file,
-          columnNumber: 1,
-          lineNumber: 1,
-        };
+      while (currentInstance) {
+        if (currentInstance.type && currentInstance.type.__file) {
+          return {
+            fileName: window.env.__dirname + "/" + currentInstance.type.__file,
+            columnNumber: 1,
+            lineNumber: 1,
+          };
+        }
+
+        currentInstance = currentInstance.parent;
       }
+
       currentElement = currentElement.parentNode;
     }
     return null;
