@@ -3,7 +3,7 @@
 // @namespace    http://tampermonkey.net/
 // @version      0.3
 // @description  Option+Click to jump to source in Cursor editor
-// @match        *
+// @match        *://*/*
 // @grant        none
 // @run-at       document-idle
 // ==/UserScript==
@@ -25,19 +25,18 @@
   };
 
   const getVueSourceFile = (element) => {
-    if (!element) return null;
+    if (!element) {
+      return null;
+    }
 
     let currentElement = element;
     while (currentElement) {
-      const instance = currentElement.__vueParentComponent;
-      let currentInstance = instance;
+      let currentInstance = currentElement.__vueParentComponent;
 
       while (currentInstance) {
         if (currentInstance.type && currentInstance.type.__file) {
           return {
             fileName: window.env.__dirname + "/" + currentInstance.type.__file,
-            columnNumber: 1,
-            lineNumber: 1,
           };
         }
 
@@ -52,31 +51,47 @@
   const openInCursor = ({ fileName, lineNumber = 1, columnNumber = 1 }) => {
     if (!fileName) return;
     const url = `cursor://file/${fileName}:${lineNumber}:${columnNumber}`;
-    console.log("[Jump to Cursor]", url);
-    window.open(url);
+
+    window.location.href = url;
+    // window.open(url);
   };
 
   const initClickListener = () => {
-    document.body.addEventListener("click", (event) => {
-      if (!event.altKey) return;
-
-      const target = event.target;
-      if (target.__vueParentComponent) {
-        const vueSource = getVueSourceFile(target);
-        if (vueSource) {
-          openInCursor(vueSource);
-          event.preventDefault();
+    document.body.addEventListener(
+      "click",
+      (event) => {
+        if (!event.altKey) {
+          return;
         }
-        return;
-      }
 
-      const reactSource = getReactSourceFile(target);
-      if (reactSource) {
-        openInCursor(reactSource);
         event.preventDefault();
-        return;
-      }
-    });
+        event.stopImmediatePropagation();
+
+        const target = event.target;
+        if (target.__vueParentComponent) {
+          const source = getVueSourceFile(target);
+
+          if (source) {
+            openInCursor({
+              fileName: source.fileName,
+              columnNumber: 1,
+              lineNumber: 1,
+            });
+          }
+
+          return;
+        }
+
+        const source = getReactSourceFile(target);
+        if (source) {
+          const { fileName, lineNumber, columnNumber } = source;
+
+          openInCursor({ fileName, lineNumber, columnNumber });
+          return;
+        }
+      },
+      true
+    );
   };
 
   if (document.readyState === "loading") {
