@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         网页取色器（Command+Shift+X 触发，仅HEX）
+// @name         网页取色器（Command+Shift+X）
 // @namespace    http://tampermonkey.net/
 // @version      1.1
 // @description  使用快捷键 Command+Shift+X 取色，自动复制 HEX（基于 EyeDropper API）
