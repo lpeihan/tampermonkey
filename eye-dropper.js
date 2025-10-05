@@ -3,7 +3,7 @@
 // @namespace    http://tampermonkey.net/
 // @version      1.1
 // @description  使用快捷键 Command+Shift+X 取色，自动复制 HEX（基于 EyeDropper API）
-// @author       庄纪伟
+// @author       lipeihan
 // @match        *://*/*
 // @grant        GM_addStyle
 // @run-at       document-end

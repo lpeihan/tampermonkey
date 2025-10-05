@@ -3,6 +3,7 @@
 // @namespace    http://tampermonkey.net/
 // @version      0.3
 // @description  Option+Click to jump to source in Cursor editor
+// @author       lipeihan
 // @match        *://*/*
 // @grant        none
 // @run-at       document-idle
