@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         网页取色器（Command+Shift+X）
+// @name         网页取色器（Command+Shift+X，仅HEX，带颜色预览）
 // @namespace    http://tampermonkey.net/
-// @version      1.1
-// @description  使用快捷键 Command+Shift+X 取色，自动复制 HEX（基于 EyeDropper API）
+// @version      1.2
+// @description  使用快捷键 Command+Shift+X 取色，自动复制 HEX 并显示颜色预览（基于 EyeDropper API）
 // @author       lipeihan
 // @match        *://*/*
 // @grant        GM_addStyle
@@ -27,19 +27,39 @@
       opacity: 0;
       transition: .2s ease;
       z-index: 2147483647;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
     }
     .tm-toast.show {
       opacity: 1;
       transform: translateX(-50%) translateY(0);
     }
+    .tm-color-box {
+      width: 16px;
+      height: 16px;
+      border-radius: 3px;
+      border: 1px solid rgba(255,255,255,0.5);
+      flex-shrink: 0;
+    }
   `);
 
   // === 提示框函数 ===
-  function showToast(msg, timeout = 2000) {
+  function showToast(msg, color = null, timeout = 2200) {
     const t = document.createElement("div");
     t.className = "tm-toast";
-    t.textContent = msg;
+    if (color) {
+      const box = document.createElement("div");
+      box.className = "tm-color-box";
+      box.style.background = color;
+      t.appendChild(box);
+    }
+    const span = document.createElement("span");
+    span.textContent = msg;
+    t.appendChild(span);
     document.body.appendChild(t);
+
     setTimeout(() => t.classList.add("show"), 10);
     setTimeout(() => t.classList.remove("show"), timeout);
     setTimeout(() => t.remove(), timeout + 300);
@@ -56,14 +76,14 @@
       const result = await eye.open();
       const hex = result.sRGBHex.toUpperCase();
       await navigator.clipboard.writeText(hex);
-      showToast(`✅ 已复制：${hex}`);
+      showToast(`已复制：${hex}`, hex);
     } catch {
       showToast("已取消取色");
     }
   }
 
+  // === 快捷键监听：Command + Shift + X ===
   window.addEventListener("keydown", (e) => {
-    // Mac 上是 metaKey，Windows 上是 ctrlKey
     if (e.metaKey && e.shiftKey && e.code === "KeyX") {
       e.preventDefault();
       pickColor();
