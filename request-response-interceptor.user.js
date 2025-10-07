@@ -11,11 +11,7 @@
 (function () {
   "use strict";
 
-  const TARGET_KEYWORDS = [];
-
-  const shouldIntercept = (url) => {
-    return TARGET_KEYWORDS.some((keyword) => url.includes(keyword));
-  };
+  const INTERCEPTOR_URLS = [];
 
   const origOpen = XMLHttpRequest.prototype.open;
   const origSend = XMLHttpRequest.prototype.send;
@@ -26,7 +22,7 @@
   };
 
   XMLHttpRequest.prototype.send = function (body) {
-    if (!shouldIntercept(this._url)) {
+    if (!INTERCEPTOR_URLS.some((keyword) => url.includes(keyword))) {
       return origSend.call(this, body);
     }
 
@@ -57,11 +53,9 @@ const originalFetch = window.fetch;
 window.fetch = async (...args) => {
   let [url, options] = args;
 
-  if (!shouldIntercept(url)) {
+  if (!INTERCEPTOR_URLS.some((keyword) => url.includes(keyword))) {
     return originalFetch(url, options);
   }
-
-  console.log("[TM] Intercept fetch:", url);
 
   if (options && options.body) {
     try {
@@ -90,7 +84,6 @@ window.fetch = async (...args) => {
       headers: response.headers,
     });
   } catch (err) {
-    console.error("Error reading response:", err);
     return response;
   }
 };
