@@ -11,7 +11,7 @@
   "use strict";
 
   // 设置要拦截的 URL 关键词
-  const TARGET_KEYWORDS = ["/api/", "/v1/"]; // 可以改成你想要匹配的路径片段
+  const TARGET_KEYWORDS = []; // 可以改成你想要匹配的路径片段
 
   const shouldIntercept = (url) => {
     return TARGET_KEYWORDS.some((keyword) => url.includes(keyword));
@@ -100,6 +100,4 @@
 
     return origSend.call(this, body);
   };
-
-  console.log("Tampermonkey conditional interceptor active");
 })();
