@@ -12,7 +12,7 @@
 (function () {
   "use strict";
 
-  // === 样式：提示框 ===
+  // eslint-disable-next-line no-undef
   GM_addStyle(`
     .tm-toast {
       position: fixed;
@@ -45,7 +45,6 @@
     }
   `);
 
-  // === 提示框函数 ===
   function showToast(msg, color = null, timeout = 2200) {
     const t = document.createElement("div");
     t.className = "tm-toast";

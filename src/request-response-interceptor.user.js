@@ -22,7 +22,7 @@
   };
 
   XMLHttpRequest.prototype.send = function (body) {
-    if (!INTERCEPTOR_URLS.some((keyword) => url.includes(keyword))) {
+    if (!INTERCEPTOR_URLS.some((keyword) => this._url.includes(keyword))) {
       return origSend.call(this, body);
     }
 
@@ -47,43 +47,43 @@
 
     return origSend.call(this, body);
   };
+
+  const originalFetch = window.fetch;
+  window.fetch = async (...args) => {
+    let [url, options] = args;
+
+    if (!INTERCEPTOR_URLS.some((keyword) => url.includes(keyword))) {
+      return originalFetch(url, options);
+    }
+
+    if (options && options.body) {
+      try {
+        const body = JSON.parse(options.body);
+        body.modifiedByTM = true;
+
+        options.body = JSON.stringify(body);
+      } catch (e) {}
+    }
+
+    const response = await originalFetch(url, options);
+
+    const clone = response.clone();
+    try {
+      const text = await clone.text();
+      let data = text;
+      try {
+        const json = JSON.parse(text);
+        // json.modifiedByTM = true;
+
+        data = JSON.stringify(json);
+      } catch (e) {}
+      return new Response(data, {
+        status: response.status,
+        statusText: response.statusText,
+        headers: response.headers,
+      });
+    } catch (err) {
+      return response;
+    }
+  };
 })();
-
-const originalFetch = window.fetch;
-window.fetch = async (...args) => {
-  let [url, options] = args;
-
-  if (!INTERCEPTOR_URLS.some((keyword) => url.includes(keyword))) {
-    return originalFetch(url, options);
-  }
-
-  if (options && options.body) {
-    try {
-      const body = JSON.parse(options.body);
-      body.modifiedByTM = true;
-
-      options.body = JSON.stringify(body);
-    } catch (e) {}
-  }
-
-  const response = await originalFetch(url, options);
-
-  const clone = response.clone();
-  try {
-    const text = await clone.text();
-    let data = text;
-    try {
-      const json = JSON.parse(text);
-      // json.modifiedByTM = true;
-
-      data = JSON.stringify(json);
-    } catch (e) {}
-    return new Response(data, {
-      status: response.status,
-      statusText: response.statusText,
-      headers: response.headers,
-    });
-  } catch (err) {
-    return response;
-  }
-};

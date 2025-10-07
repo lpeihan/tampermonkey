@@ -1,0 +1,25 @@
+{
+  "name": "tampermonkey",
+  "version": "1.0.0",
+  "main": "click-to-editor.user.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lpeihan/tampermonkey.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lpeihan/tampermonkey/issues"
+  },
+  "homepage": "https://github.com/lpeihan/tampermonkey#readme",
+  "description": "",
+  "devDependencies": {
+    "@eslint/js": "^9.37.0",
+    "eslint": "^9.37.0",
+    "globals": "^16.4.0"
+  }
+}
