@@ -10,9 +10,6 @@
 
 (function () {
   "use strict";
-
-  const INTERCEPTOR_URLS = [];
-
   const origOpen = XMLHttpRequest.prototype.open;
   const origSend = XMLHttpRequest.prototype.send;
 
@@ -22,14 +19,13 @@
   };
 
   XMLHttpRequest.prototype.send = function (body) {
-    if (!INTERCEPTOR_URLS.some((keyword) => this._url.includes(keyword))) {
-      return origSend.call(this, body);
-    }
-
     if (body) {
       try {
         const parsed = JSON.parse(body);
-        parsed.modifiedByTM = true;
+        if (this._url.includes("")) {
+          // TODO
+        }
+
         body = JSON.stringify(parsed);
       } catch (e) {}
     }
@@ -38,7 +34,10 @@
       try {
         let response = this.responseText;
         const json = JSON.parse(response);
-        // json.modifiedByTM = true;
+
+        if (this._url.includes("")) {
+          // TODO
+        }
 
         response = JSON.stringify(json);
         Object.defineProperty(this, "responseText", { value: response });
@@ -52,14 +51,12 @@
   window.fetch = async (...args) => {
     let [url, options] = args;
 
-    if (!INTERCEPTOR_URLS.some((keyword) => url.includes(keyword))) {
-      return originalFetch(url, options);
-    }
-
     if (options && options.body) {
       try {
         const body = JSON.parse(options.body);
-        body.modifiedByTM = true;
+        if (url.includes("")) {
+          // TODO
+        }
 
         options.body = JSON.stringify(body);
       } catch (e) {}
@@ -73,7 +70,9 @@
       let data = text;
       try {
         const json = JSON.parse(text);
-        // json.modifiedByTM = true;
+        if (url.includes("")) {
+          // TODO
+        }
 
         data = JSON.stringify(json);
       } catch (e) {}
